@@ -5,7 +5,7 @@ import QuestionBankView from './components/QuestionBankView';
 import LoginPage from './components/LoginPage';
 import ChatBot from './components/ChatBot';
 import AdminDashboard from './components/AdminDashboard';
-import StudyGlancePanel from './components/StudyGlancePanel';
+
 import { generateSets } from './components/SetGenerator';
 import { generateWordDocument, generatePDF, generateAllWordDocuments, generateAllPDFs } from './utils/documentGenerator';
 import type { ExamDetails, Question, QuestionPaperSet, SavedPaper, QuestionBank } from './types';
@@ -22,12 +22,14 @@ const btn = (bg: string): React.CSSProperties => ({ ...NAV_BTN, background: bg }
 function PageFooter() {
   return (
     <div style={{
-      textAlign: 'center', padding: '20px 16px 24px',
+      display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: '4px',
+      padding: '20px 16px 24px',
       color: 'rgba(255,255,255,0.3)', fontSize: 12,
+      textAlign: 'center'
     }}>
-      Developed and Maintained by{' '}
+      <span>Developed and Maintained by</span>
       <strong style={{ color: 'rgba(165,180,252,0.6)' }}>Mrs. Priyanka Pandarinath</strong>
-      , Assistant Professor
+      <span>, Assistant Professor</span>
     </div>
   );
 }
@@ -156,14 +158,37 @@ function App() {
   const [sets, setSets] = useState<QuestionPaperSet[]>([]);
   const [activeSetIndex, setActiveSetIndex] = useState(0);
   const [view, setView] = useState<'input' | 'preview' | 'history' | 'bank' | 'admin'>('input');
-  const [showResources, setShowResources] = useState(false);
+
   const [showWAModal, setShowWAModal] = useState(false);
   const [waMessage, setWaMessage] = useState('');
   const [currentUser, setCurrentUser] = useState<string>('');
 
   const [history, setHistory] = useState<SavedPaper[]>(() => {
     const saved = localStorage.getItem('paperHistory');
-    return saved ? JSON.parse(saved) : [];
+    const parsed = saved ? JSON.parse(saved) : [];
+    if (parsed.length === 0) {
+      return [{
+        id: 'sample-paper-001',
+        date: new Date().toLocaleString(),
+        createdBy: 'system',
+        isSample: true,
+        details: {
+          collegeName: "TECH UNIVERSITY OF EXCELLENCE",
+          examName: 'B.TECH II YEAR I SEMESTER – SAMPLE EXAMINATION',
+          subject: 'Sample: Computer Networks',
+          subjectCode: 'CS301',
+          branch: 'CSE',
+          date: '2026-03-24',
+          time: '3 Hours',
+          maxMarks: 100,
+        },
+        sets: [],
+        mcqs: [],
+        fibs: [],
+        partB: [],
+      }];
+    }
+    return parsed;
   });
 
   const [questionBank, setQuestionBank] = useState<QuestionBank>(() => {
@@ -208,44 +233,18 @@ function App() {
   useEffect(() => { localStorage.setItem('formFibs', JSON.stringify(fibs)); }, [fibs]);
   useEffect(() => { localStorage.setItem('formPartB', JSON.stringify(partB)); }, [partB]);
 
-  // ── Initialize Sample Paper ──
-  useEffect(() => {
-    const hasSample = history.some(p => p.isSample);
-    if (!hasSample && history.length === 0) {
-      const samplePaper: SavedPaper = {
-        id: 'sample-paper-001',
-        date: new Date().toLocaleString(),
-        createdBy: 'system',
-        isSample: true,
-        details: {
-          collegeName: "TECH UNIVERSITY OF EXCELLENCE",
-          examName: 'B.TECH II YEAR I SEMESTER – SAMPLE EXAMINATION',
-          subject: 'Sample: Computer Networks',
-          subjectCode: 'CS301',
-          branch: 'CSE',
-          date: '2026-03-24',
-          time: '3 Hours',
-          maxMarks: 100,
-        },
-        sets: [],
-        mcqs: [],
-        fibs: [],
-        partB: [],
-      };
-      setHistory([samplePaper]);
-    }
-  }, []);
 
-  const handleLogin = (username: string) => { 
-    setIsAuthenticated(true); 
+
+  const handleLogin = (username: string) => {
+    setIsAuthenticated(true);
     setCurrentUser(username);
     setIsAdmin(username.toLowerCase() === 'admin');
   };
-  const handleLogout = () => { 
-    setIsAuthenticated(false); 
-    setCurrentUser(''); 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setCurrentUser('');
     setIsAdmin(false);
-    setView('input'); 
+    setView('input');
   };
 
   const handleGenerate = () => {
@@ -304,19 +303,10 @@ function App() {
   };
 
 
-  // ── shared panel + chatbot ──
-  const Panels = () => {
-    const storedUsers = JSON.parse(localStorage.getItem('facultyUsers') || '[]');
-    const userProfile = storedUsers.find((u: any) => u.username === currentUser);
+  // ── shared chatbot ──
+  const renderPanels = () => {
     return (
       <>
-        <StudyGlancePanel 
-          isOpen={showResources} 
-          onClose={() => setShowResources(false)} 
-          currentSubject={details.subject} 
-          facultySubject={userProfile?.subject}
-          isAdmin={isAdmin}
-        />
         <ChatBot />
       </>
     );
@@ -330,7 +320,7 @@ function App() {
       <>
         <QuestionBankView questionBank={questionBank} setQuestionBank={setQuestionBank} onBack={() => setView('input')} />
         <PageFooter />
-        <Panels />
+        {renderPanels()}
       </>
     );
   }
@@ -341,7 +331,7 @@ function App() {
       <>
         <AdminDashboard onBack={() => setView('input')} />
         <PageFooter />
-        <Panels />
+        {renderPanels()}
       </>
     );
   }
@@ -362,7 +352,7 @@ function App() {
             }
             right={
               <>
-                <button style={btn('rgba(99,102,241,0.6)')} onClick={() => setShowResources(true)}>📚 Resources</button>
+
                 {isAdmin && <button style={btn('rgba(16,185,129,0.85)')} onClick={() => setView('admin')}>Admin Panel</button>}
                 <button style={btn('rgba(99,102,241,0.85)')} onClick={() => setView('bank')}>Question Bank</button>
                 <button style={btn('rgba(124,58,237,0.85)')} onClick={() => setView('history')}>Previous Papers</button>
@@ -380,7 +370,7 @@ function App() {
           />
           <PageFooter />
         </div>
-        <Panels />
+        {renderPanels()}
       </>
     );
   }
@@ -394,7 +384,7 @@ function App() {
             left={<span style={{ color: '#a5b4fc', fontWeight: 800, fontSize: 16 }}>📂 Previous Papers</span>}
             right={
               <>
-                <button style={btn('rgba(99,102,241,0.6)')} onClick={() => setShowResources(true)}>📚 Resources</button>
+
                 <button style={btn('rgba(107,114,128,0.7)')} onClick={() => setView('input')}>Back to Edit</button>
                 <button style={btn('rgba(59,130,246,0.7)')} onClick={() => setView('preview')} disabled={sets.length === 0}>
                   Back to Preview
@@ -405,7 +395,7 @@ function App() {
 
           <div style={{ padding: '36px 32px' }}>
             {(() => {
-              const filteredHistory = history.filter(paper => 
+              const filteredHistory = history.filter(paper =>
                 isAdmin || paper.isSample || paper.createdBy === currentUser
               );
 
@@ -420,70 +410,70 @@ function App() {
               return (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
                   {filteredHistory.map(paper => (
-                  <div
-                    key={paper.id}
-                    onClick={() => handleLoadPaper(paper)}
-                    style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: 16, padding: '22px 24px',
-                      cursor: 'pointer', transition: 'all 0.18s',
-                    }}
-                    onMouseEnter={e => {
-                      (e.currentTarget as HTMLDivElement).style.background = 'rgba(99,102,241,0.15)';
-                      (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(99,102,241,0.4)';
-                      (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
-                    }}
-                    onMouseLeave={e => {
-                      (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.05)';
-                      (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.1)';
-                      (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
-                      <div>
-                        <div style={{ color: '#e0e7ff', fontWeight: 700, fontSize: 15, marginBottom: 4 }}>{paper.details.subject}</div>
-                        <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12 }}>{paper.details.examName}</div>
-                        <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, marginTop: 4 }}>🕐 {paper.date}</div>
+                    <div
+                      key={paper.id}
+                      onClick={() => handleLoadPaper(paper)}
+                      style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: 16, padding: '22px 24px',
+                        cursor: 'pointer', transition: 'all 0.18s',
+                      }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLDivElement).style.background = 'rgba(99,102,241,0.15)';
+                        (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(99,102,241,0.4)';
+                        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.05)';
+                        (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.1)';
+                        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+                        <div>
+                          <div style={{ color: '#e0e7ff', fontWeight: 700, fontSize: 15, marginBottom: 4 }}>{paper.details.subject}</div>
+                          <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: 12 }}>{paper.details.examName}</div>
+                          <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, marginTop: 4 }}>🕐 {paper.date}</div>
+                        </div>
+                        {paper.isSample ? (
+                          <div style={{ background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.4)', color: '#6ee7b7', borderRadius: 8, padding: '4px 10px', fontSize: 11, fontWeight: 700 }}>
+                            SAMPLE
+                          </div>
+                        ) : (
+                          <button
+                            onClick={e => handleDeletePaper(paper.id, e)}
+                            style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5', borderRadius: 8, padding: '4px 8px', cursor: 'pointer', fontSize: 12 }}
+                            title="Delete"
+                          >
+                            🗑
+                          </button>
+                        )}
                       </div>
-                      {paper.isSample ? (
-                        <div style={{ background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.4)', color: '#6ee7b7', borderRadius: 8, padding: '4px 10px', fontSize: 11, fontWeight: 700 }}>
-                          SAMPLE
-                        </div>
-                      ) : (
-                        <button
-                          onClick={e => handleDeletePaper(paper.id, e)}
-                          style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5', borderRadius: 8, padding: '4px 8px', cursor: 'pointer', fontSize: 12 }}
-                          title="Delete"
-                        >
-                          🗑
-                        </button>
-                      )}
+                      <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 16 }}>
+                        <span>Branch: {paper.details.branch}</span> &nbsp;·&nbsp; <span>Sets: {paper.sets.length}</span>
+                        {isAdmin && paper.createdBy && (
+                          <div style={{ marginTop: 4, color: 'rgba(255,255,255,0.3)', fontSize: 10 }}>
+                            Created by: {paper.createdBy} {paper.isSample ? '(System)' : ''}
+                          </div>
+                        )}
+                      </div>
+                      <div style={{
+                        padding: '8px 12px', borderRadius: 8, textAlign: 'center',
+                        background: 'rgba(99,102,241,0.2)', color: '#a5b4fc',
+                        fontSize: 12, fontWeight: 700,
+                      }}>
+                        Load & Preview →
+                      </div>
                     </div>
-                    <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, marginBottom: 16 }}>
-                      <span>Branch: {paper.details.branch}</span> &nbsp;·&nbsp; <span>Sets: {paper.sets.length}</span>
-                      {isAdmin && paper.createdBy && (
-                        <div style={{ marginTop: 4, color: 'rgba(255,255,255,0.3)', fontSize: 10 }}>
-                          Created by: {paper.createdBy} {paper.isSample ? '(System)' : ''}
-                        </div>
-                      )}
-                    </div>
-                    <div style={{
-                      padding: '8px 12px', borderRadius: 8, textAlign: 'center',
-                      background: 'rgba(99,102,241,0.2)', color: '#a5b4fc',
-                      fontSize: 12, fontWeight: 700,
-                    }}>
-                      Load & Preview →
-                    </div>
-                  </div>
-                ))}
+                  ))}
                 </div>
               );
             })()}
           </div>
           <PageFooter />
         </div>
-        <Panels />
+        {renderPanels()}
       </>
     );
   }
@@ -526,7 +516,7 @@ function App() {
           </div>
           {/* Right */}
           <div style={{ display: 'flex', gap: 8 }}>
-            <button style={btn('rgba(99,102,241,0.6)')} onClick={() => setShowResources(true)}>📚 Resources</button>
+
             <button style={btn('rgba(37,99,235,0.8)')} onClick={handleDownloadWord}>Word</button>
             <button style={btn('rgba(29,78,216,0.8)')} onClick={handleDownloadAllWord}>All Word</button>
             <button style={btn('rgba(220,38,38,0.8)')} onClick={handleDownloadPDF}>PDF</button>
@@ -559,7 +549,7 @@ function App() {
           <PageFooter />
         </div>
       </div>
-      <Panels />
+      {renderPanels()}
       {showWAModal && <WhatsAppModal message={waMessage} onClose={() => setShowWAModal(false)} />}
     </>
   );
