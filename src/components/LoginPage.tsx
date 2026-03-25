@@ -82,17 +82,18 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         <div style={{
             minHeight: '100vh',
             background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between',
         }}>
             {/* Decorative glow blobs */}
             <div style={{ position: 'absolute', top: '15%', left: '20%', width: 320, height: 320, borderRadius: '50%', background: 'rgba(99,102,241,0.12)', filter: 'blur(80px)', pointerEvents: 'none' }} />
             <div style={{ position: 'absolute', bottom: '15%', right: '20%', width: 260, height: 260, borderRadius: '50%', background: 'rgba(124,58,237,0.12)', filter: 'blur(60px)', pointerEvents: 'none' }} />
 
-            <div style={{
-                width: 400, padding: '44px 40px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: 20,
+            <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', width: '100%', padding: '40px 20px', boxSizing: 'border-box', position: 'relative', zIndex: 1 }}>
+                <div style={{
+                    width: '100%', maxWidth: 400, padding: '44px 40px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: 20,
                 backdropFilter: 'blur(16px)',
                 boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
                 position: 'relative',
@@ -266,6 +267,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 )}
             </div>
 
+            </div>
+
             <style>{`
         @keyframes loginFadeIn {
           from { opacity: 0; transform: translateY(20px); }
@@ -276,12 +279,18 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
             {/* Footer */}
             <div style={{
-                position: 'absolute', bottom: 20, left: 0, right: 0,
-                textAlign: 'center', color: 'rgba(255,255,255,0.3)', fontSize: 12,
+                display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', gap: '4px',
+                color: 'rgba(255,255,255,0.3)', fontSize: 12,
                 pointerEvents: 'none',
+                padding: '20px',
+                textAlign: 'center',
+                width: '100%',
+                position: 'relative',
+                zIndex: 1
             }}>
-                Developed and Maintained by<br />
-                <strong style={{ color: 'rgba(165,180,252,0.6)' }}>Mrs. Priyanka Pandarinath</strong>, Assistant Professor
+                <span>Developed and Maintained by</span>
+                <strong style={{ color: 'rgba(165,180,252,0.6)' }}>Mrs. Priyanka Pandarinath</strong>
+                <span>, Assistant Professor</span>
             </div>
         </div>
     );
