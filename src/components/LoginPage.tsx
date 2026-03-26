@@ -193,7 +193,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             }}>
                 <span>Developed and Maintained by</span>
                 <strong style={{ color: 'rgba(165,180,252,0.6)' }}>Mrs. Priyanka Pandarinath</strong>
-                <span>, Assistant Professor</span>
+                <span>, Assistant Professor, S. Pranavi Reddy and M. Maniroop(III Data Science)</span>
             </div>
         </div>
     );
