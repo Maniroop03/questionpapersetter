@@ -29,7 +29,9 @@ function PageFooter() {
     }}>
       <span>Developed and Maintained by</span>
       <strong style={{ color: 'rgba(165,180,252,0.6)' }}>Mrs. Priyanka Pandarinath</strong>
-      <span>, Assistant Professor</span>
+      <span>, Assistant Professor, </span>
+      <strong style={{ color: 'rgba(165,180,252,0.6)' }}>S. Pranavi Reddy and M. Maniroop</strong>
+      <span> (III Data Science)</span>
     </div>
   );
 }
@@ -198,7 +200,7 @@ function App() {
 
   const [details, setDetails] = useState<ExamDetails>(() => {
     const saved = localStorage.getItem('formDetails');
-    return saved ? JSON.parse(saved) : {
+    const d = saved ? JSON.parse(saved) : {
       collegeName: "NALLA NARASIMHA REDDY EDUCATION SOCIETY'S GROUP OF INSTITUTIONS",
       examName: 'II B.TECH II SEMESTER – I MID TERM EXAMINATION –FEB-2026',
       subject: 'Database Management Systems',
@@ -208,6 +210,7 @@ function App() {
       time: '2 Hours (1:30PM TO 3:30PM)',
       maxMarks: 30,
     };
+    return { ...d, collegeName: "NALLA NARASIMHA REDDY EDUCATION SOCIETY'S GROUP OF INSTITUTIONS" };
   });
 
   const [mcqs, setMcqs] = useState<Question[]>(() => {
