@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 
+interface User {
+    username: string;
+    password?: string;
+    fullName?: string;
+}
+
 interface LoginPageProps {
     onLogin: (username: string) => void;
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
-    const [isLoginView, setIsLoginView] = useState(true);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [fullName, setFullName] = useState('');
-    const [subject, setSubject] = useState('');
-    const [teachingYear, setTeachingYear] = useState('');
     const [error, setError] = useState('');
 
     useEffect(() => {
@@ -20,7 +22,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             storedUsers.push({ username: 'faculty', password: 'password123' });
             storedUsers.push({ username: 'admin', password: 'adminpassword' });
             localStorage.setItem('facultyUsers', JSON.stringify(storedUsers));
-        } else if (!storedUsers.find((u: any) => u.username === 'admin')) {
+        } else if (!storedUsers.find((u: User) => u.username === 'admin')) {
             storedUsers.push({ username: 'admin', password: 'adminpassword' });
             localStorage.setItem('facultyUsers', JSON.stringify(storedUsers));
         }
@@ -46,35 +48,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         }
 
         const storedUsers = JSON.parse(localStorage.getItem('facultyUsers') || '[]');
+        const validUser = storedUsers.find((u: User) => u.username === username && u.password === password);
         
-        if (isLoginView) {
-            const validUser = storedUsers.find((u: any) => u.username === username && u.password === password);
-            if (validUser) {
-                recordLogin(username);
-                onLogin(username);
-            } else {
-                setError('Invalid credentials. Please try again.');
-            }
+        if (validUser) {
+            recordLogin(username);
+            onLogin(username);
         } else {
-            if (!fullName.trim() || !subject.trim() || !teachingYear.trim()) {
-                setError('All fields are required for registration.');
-                return;
-            }
-            const userExists = storedUsers.find((u: any) => u.username === username);
-            if (userExists) {
-                setError('Username already exists. Please choose a different one.');
-            } else {
-                storedUsers.push({ 
-                    username, 
-                    password, 
-                    fullName, 
-                    subject, 
-                    teachingYear 
-                });
-                localStorage.setItem('facultyUsers', JSON.stringify(storedUsers));
-                recordLogin(username);
-                onLogin(username);
-            }
+            setError('Invalid credentials. Please try again.');
         }
     };
 
@@ -110,7 +90,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                     }}>📝</div>
                     <h1 style={{ color: '#fff', fontSize: 22, fontWeight: 800, margin: 0 }}>Question Paper Setter</h1>
                     <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 6 }}>
-                        {isLoginView ? 'Faculty Portal — Sign in to continue' : 'Faculty Portal — Create an account'}
+                        Faculty Portal — Sign in to continue
                     </p>
                 </div>
 
@@ -125,70 +105,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 )}
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                    {!isLoginView && (
-                        <>
-                            <div>
-                                <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-                                    Faculty Full Name
-                                </label>
-                                <input
-                                    type="text"
-                                    value={fullName}
-                                    onChange={e => setFullName(e.target.value)}
-                                    placeholder="e.g. Dr. John Smith"
-                                    style={{
-                                        marginTop: 8, width: '100%', boxSizing: 'border-box',
-                                        padding: '11px 14px', borderRadius: 10,
-                                        background: 'rgba(255,255,255,0.07)',
-                                        border: '1px solid rgba(255,255,255,0.15)',
-                                        color: '#fff', fontSize: 14, outline: 'none',
-                                    }}
-                                />
-                            </div>
-                            <div style={{ display: 'flex', gap: 12 }}>
-                                <div style={{ flex: 2 }}>
-                                    <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-                                        Teaching Subject
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={subject}
-                                        onChange={e => setSubject(e.target.value)}
-                                        placeholder="e.g. DBMS"
-                                        style={{
-                                            marginTop: 8, width: '100%', boxSizing: 'border-box',
-                                            padding: '11px 14px', borderRadius: 10,
-                                            background: 'rgba(255,255,255,0.07)',
-                                            border: '1px solid rgba(255,255,255,0.15)',
-                                            color: '#fff', fontSize: 14, outline: 'none',
-                                        }}
-                                    />
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-                                        Year
-                                    </label>
-                                    <select
-                                        value={teachingYear}
-                                        onChange={e => setTeachingYear(e.target.value)}
-                                        style={{
-                                            marginTop: 8, width: '100%', boxSizing: 'border-box',
-                                            padding: '11px 14px', borderRadius: 10,
-                                            background: 'rgba(255,255,255,0.07)',
-                                            border: '1px solid rgba(255,255,255,0.15)',
-                                            color: '#fff', fontSize: 14, outline: 'none',
-                                            appearance: 'none', cursor: 'pointer'
-                                        }}
-                                    >
-                                        <option value="" style={{ background: '#1e1b4b' }}>Select Year</option>
-                                        <option value="II yr" style={{ background: '#1e1b4b' }}>II yr</option>
-                                        <option value="III yr" style={{ background: '#1e1b4b' }}>III yr</option>
-                                        <option value="IV yr" style={{ background: '#1e1b4b' }}>IV yr</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </>
-                    )}
+
                     <div>
                         <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
                             Username
@@ -241,30 +158,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                         onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
                         onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
                     >
-                        {isLoginView ? 'Sign In' : 'Create Account'}
+                        Sign In
                     </button>
                     
-                    <div style={{ textAlign: 'center', marginTop: 10 }}>
-                        <button
-                            type="button"
-                            onClick={() => { setIsLoginView(!isLoginView); setError(''); setUsername(''); setPassword(''); }}
-                            style={{
-                                background: 'none', border: 'none',
-                                color: '#a5b4fc', fontSize: 13, cursor: 'pointer',
-                                textDecoration: 'underline', padding: 0
-                            }}
-                        >
-                            {isLoginView ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-                        </button>
-                    </div>
+
                 </form>
 
-                {isLoginView && (
                     <div style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11, textAlign: 'center', marginTop: 24 }}>
                         <div>Faculty: faculty / password123</div>
                         <div style={{ marginTop: 4 }}>Admin: admin / adminpassword</div>
                     </div>
-                )}
             </div>
 
             </div>
