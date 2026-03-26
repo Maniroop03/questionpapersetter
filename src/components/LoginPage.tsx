@@ -41,7 +41,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
-        
+
         if (!username.trim() || !password.trim()) {
             setError('Username and password are required.');
             return;
@@ -49,7 +49,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
 
         const storedUsers = JSON.parse(localStorage.getItem('facultyUsers') || '[]');
         const validUser = storedUsers.find((u: User) => u.username === username && u.password === password);
-        
+
         if (validUser) {
             recordLogin(username);
             onLogin(username);
@@ -74,101 +74,101 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                     background: 'rgba(255,255,255,0.05)',
                     border: '1px solid rgba(255,255,255,0.1)',
                     borderRadius: 20,
-                backdropFilter: 'blur(16px)',
-                boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
-                position: 'relative',
-                animation: 'loginFadeIn 0.4s ease-out',
-            }}>
-                {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: 36 }}>
-                    <div style={{
-                        width: 60, height: 60, borderRadius: 16,
-                        background: 'linear-gradient(135deg, #4338ca, #7c3aed)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 28, margin: '0 auto 16px',
-                        boxShadow: '0 8px 24px rgba(99,102,241,0.4)',
-                    }}>📝</div>
-                    <h1 style={{ color: '#fff', fontSize: 22, fontWeight: 800, margin: 0 }}>Question Paper Setter</h1>
-                    <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 6 }}>
-                        Faculty Portal — Sign in to continue
-                    </p>
-                </div>
-
-                {error && (
-                    <div style={{
-                        background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)',
-                        borderRadius: 10, padding: '10px 14px', marginBottom: 20,
-                        color: '#fca5a5', fontSize: 13, textAlign: 'center',
-                    }}>
-                        {error}
+                    backdropFilter: 'blur(16px)',
+                    boxShadow: '0 24px 60px rgba(0,0,0,0.5)',
+                    position: 'relative',
+                    animation: 'loginFadeIn 0.4s ease-out',
+                }}>
+                    {/* Header */}
+                    <div style={{ textAlign: 'center', marginBottom: 36 }}>
+                        <div style={{
+                            width: 60, height: 60, borderRadius: 16,
+                            background: 'linear-gradient(135deg, #4338ca, #7c3aed)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 28, margin: '0 auto 16px',
+                            boxShadow: '0 8px 24px rgba(99,102,241,0.4)',
+                        }}>📝</div>
+                        <h1 style={{ color: '#fff', fontSize: 22, fontWeight: 800, margin: 0 }}>Question Paper Setter</h1>
+                        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, marginTop: 6 }}>
+                            Faculty Portal — Sign in to continue
+                        </p>
                     </div>
-                )}
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    {error && (
+                        <div style={{
+                            background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)',
+                            borderRadius: 10, padding: '10px 14px', marginBottom: 20,
+                            color: '#fca5a5', fontSize: 13, textAlign: 'center',
+                        }}>
+                            {error}
+                        </div>
+                    )}
 
-                    <div>
-                        <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-                            Username
-                        </label>
-                        <input
-                            type="text"
-                            id="username"
-                            value={username}
-                            onChange={e => setUsername(e.target.value)}
-                            placeholder="Enter username"
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+                        <div>
+                            <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+                                Username
+                            </label>
+                            <input
+                                type="text"
+                                id="username"
+                                value={username}
+                                onChange={e => setUsername(e.target.value)}
+                                placeholder="Enter username"
+                                style={{
+                                    marginTop: 8, width: '100%', boxSizing: 'border-box',
+                                    padding: '11px 14px', borderRadius: 10,
+                                    background: 'rgba(255,255,255,0.07)',
+                                    border: '1px solid rgba(255,255,255,0.15)',
+                                    color: '#fff', fontSize: 14, outline: 'none',
+                                }}
+                            />
+                        </div>
+                        <div>
+                            <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
+                                Password
+                            </label>
+                            <input
+                                type="password"
+                                id="password"
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                placeholder="Enter password"
+                                style={{
+                                    marginTop: 8, width: '100%', boxSizing: 'border-box',
+                                    padding: '11px 14px', borderRadius: 10,
+                                    background: 'rgba(255,255,255,0.07)',
+                                    border: '1px solid rgba(255,255,255,0.15)',
+                                    color: '#fff', fontSize: 14, outline: 'none',
+                                }}
+                            />
+                        </div>
+                        <button
+                            type="submit"
                             style={{
-                                marginTop: 8, width: '100%', boxSizing: 'border-box',
-                                padding: '11px 14px', borderRadius: 10,
-                                background: 'rgba(255,255,255,0.07)',
-                                border: '1px solid rgba(255,255,255,0.15)',
-                                color: '#fff', fontSize: 14, outline: 'none',
+                                marginTop: 8, padding: '13px',
+                                background: 'linear-gradient(90deg, #4338ca, #7c3aed)',
+                                border: 'none', borderRadius: 10,
+                                color: '#fff', fontWeight: 700, fontSize: 15,
+                                cursor: 'pointer', letterSpacing: 0.5,
+                                boxShadow: '0 4px 20px rgba(99,102,241,0.4)',
+                                transition: 'opacity 0.15s',
                             }}
-                        />
-                    </div>
-                    <div>
-                        <label style={{ color: 'rgba(255,255,255,0.55)', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1 }}>
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            value={password}
-                            onChange={e => setPassword(e.target.value)}
-                            placeholder="Enter password"
-                            style={{
-                                marginTop: 8, width: '100%', boxSizing: 'border-box',
-                                padding: '11px 14px', borderRadius: 10,
-                                background: 'rgba(255,255,255,0.07)',
-                                border: '1px solid rgba(255,255,255,0.15)',
-                                color: '#fff', fontSize: 14, outline: 'none',
-                            }}
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        style={{
-                            marginTop: 8, padding: '13px',
-                            background: 'linear-gradient(90deg, #4338ca, #7c3aed)',
-                            border: 'none', borderRadius: 10,
-                            color: '#fff', fontWeight: 700, fontSize: 15,
-                            cursor: 'pointer', letterSpacing: 0.5,
-                            boxShadow: '0 4px 20px rgba(99,102,241,0.4)',
-                            transition: 'opacity 0.15s',
-                        }}
-                        onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
-                        onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-                    >
-                        Sign In
-                    </button>
-                    
+                            onMouseEnter={e => (e.currentTarget.style.opacity = '0.88')}
+                            onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                        >
+                            Sign In
+                        </button>
 
-                </form>
+
+                    </form>
 
                     <div style={{ color: 'rgba(255,255,255,0.25)', fontSize: 11, textAlign: 'center', marginTop: 24 }}>
                         <div>Faculty: faculty / password123</div>
                         <div style={{ marginTop: 4 }}>Admin: admin / adminpassword</div>
                     </div>
-            </div>
+                </div>
 
             </div>
 
@@ -193,7 +193,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             }}>
                 <span>Developed and Maintained by</span>
                 <strong style={{ color: 'rgba(165,180,252,0.6)' }}>Mrs. Priyanka Pandarinath</strong>
-                <span>, Assistant Professor, S. Pranavi Reddy and M. Maniroop(III Data Science)</span>
+                <span>, Assistant Professor, </span>
+                <strong style={{ color: 'rgba(165,180,252,0.6)' }}> S. Pranavi Reddy and M. Maniroop</strong>
+                <span> (III Data Science)</span>
             </div>
         </div>
     );
