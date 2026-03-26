@@ -38,10 +38,12 @@ const QuestionInputForm: React.FC<QuestionInputFormProps> = ({
     const [importSubject, setImportSubject] = useState<string>('');
     const [selectedImportIds, setSelectedImportIds] = useState<number[]>([]);
 
-    const handleDetailChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    const handleDetailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.name === 'collegeName') return;
         setDetails({ ...details, [e.target.name]: e.target.value });
+    };
 
-    const handleMcqChange = (index: number, field: keyof Question, value: any) => {
+    const handleMcqChange = (index: number, field: keyof Question, value: string | string[] | number) => {
         const n = [...mcqs]; n[index] = { ...n[index], [field]: value }; setMcqs(n);
     };
     const handleOptionChange = (qi: number, oi: number, value: string) => {
@@ -50,7 +52,7 @@ const QuestionInputForm: React.FC<QuestionInputFormProps> = ({
     const handleFibChange = (index: number, value: string) => {
         const n = [...fibs]; n[index].text = value; setFibs(n);
     };
-    const handlePartBChange = (index: number, field: keyof Question, value: any) => {
+    const handlePartBChange = (index: number, field: keyof Question, value: string | number) => {
         const n = [...partB]; n[index] = { ...n[index], [field]: value }; setPartB(n);
     };
 
@@ -92,7 +94,7 @@ const QuestionInputForm: React.FC<QuestionInputFormProps> = ({
                 {TABS.map(t => (
                     <button
                         key={t.key}
-                        onClick={() => setActiveTab(t.key as any)}
+                        onClick={() => setActiveTab(t.key as 'details' | 'mcq' | 'fib' | 'partB')}
                         style={{
                             padding: '8px 18px', borderRadius: 9, border: 'none',
                             background: activeTab === t.key
@@ -144,9 +146,11 @@ const QuestionInputForm: React.FC<QuestionInputFormProps> = ({
                                 <input
                                     type="text"
                                     name={key}
-                                    value={(details as any)[key]}
+                                    value={details[key as keyof ExamDetails]}
                                     onChange={handleDetailChange}
-                                    style={{ ...INPUT_STYLE, marginTop: 6 }}
+                                    style={{ ...INPUT_STYLE, marginTop: 6, opacity: key === 'collegeName' ? 0.6 : 1, cursor: key === 'collegeName' ? 'not-allowed' : 'text' }}
+                                    readOnly={key === 'collegeName'}
+                                    disabled={key === 'collegeName'}
                                 />
                             </div>
                         ))}
@@ -297,7 +301,7 @@ const QuestionInputForm: React.FC<QuestionInputFormProps> = ({
                                             questionBank[importSubject][importType as keyof import('../types').SubjectData]) as import('../types').Question[];
                                         if (!questions || questions.length === 0)
                                             return <p style={{ color: 'rgba(255,255,255,0.3)', textAlign: 'center' }}>No questions found.</p>;
-                                        return questions.map((q: any) => (
+                                        return questions.map((q: Question) => (
                                             <div key={q.id} style={{ display: 'flex', gap: 12, alignItems: 'flex-start', padding: '10px 14px', borderRadius: 10, background: selectedImportIds.includes(q.id) ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.04)', border: `1px solid ${selectedImportIds.includes(q.id) ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)'}`, cursor: 'pointer' }}
                                                 onClick={() => setSelectedImportIds(prev => prev.includes(q.id) ? prev.filter(id => id !== q.id) : [...prev, q.id])}>
                                                 <input type="checkbox" checked={selectedImportIds.includes(q.id)} onChange={() => { }} style={{ marginTop: 3 }} />
@@ -318,11 +322,12 @@ const QuestionInputForm: React.FC<QuestionInputFormProps> = ({
                             <button
                                 onClick={() => {
                                     if (!importSubject || !importType) return;
-                                    const src = (questionBank[importSubject] as any)[importType === 'partB' ? 'partB' : importType + 's'];
-                                    const sel = src.filter((q: any) => selectedImportIds.includes(q.id));
-                                    if (importType === 'mcq') { const n = [...mcqs]; sel.forEach((q: any, i: number) => { if (i < n.length) n[i] = { ...n[i], text: q.text, options: [...(q.options || [])] }; }); setMcqs(n); }
-                                    else if (importType === 'fib') { const n = [...fibs]; sel.forEach((q: any, i: number) => { if (i < n.length) n[i] = { ...n[i], text: q.text }; }); setFibs(n); }
-                                    else if (importType === 'partB') { const n = [...partB]; sel.forEach((q: any, i: number) => { if (i < n.length) n[i] = { ...n[i], text: q.text, bloomLevel: q.bloomLevel, marks: q.marks }; }); setPartB(n); }
+                                    const subjectData = questionBank[importSubject];
+                                    const src = (subjectData[importType === 'partB' ? 'partB' : (importType + 's' as keyof typeof subjectData)]) as Question[];
+                                    const sel = src.filter((q: Question) => selectedImportIds.includes(q.id));
+                                    if (importType === 'mcq') { const n = [...mcqs]; sel.forEach((q: Question, i: number) => { if (i < n.length) n[i] = { ...n[i], text: q.text, options: [...(q.options || [])] }; }); setMcqs(n); }
+                                    else if (importType === 'fib') { const n = [...fibs]; sel.forEach((q: Question, i: number) => { if (i < n.length) n[i] = { ...n[i], text: q.text }; }); setFibs(n); }
+                                    else if (importType === 'partB') { const n = [...partB]; sel.forEach((q: Question, i: number) => { if (i < n.length) n[i] = { ...n[i], text: q.text, bloomLevel: q.bloomLevel, marks: q.marks }; }); setPartB(n); }
                                     setShowImportModal(false);
                                 }}
                                 disabled={selectedImportIds.length === 0}
