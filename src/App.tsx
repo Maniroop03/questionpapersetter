@@ -6,6 +6,7 @@ import QuestionBankView from './components/QuestionBankView';
 import LoginPage from './components/LoginPage';
 import ChatBot from './components/ChatBot';
 import AdminDashboard from './components/AdminDashboard';
+import HomeView from './components/HomeView';
 
 import { generateSets } from './components/SetGenerator';
 import { generateWordDocument, generatePDF, generateAllWordDocuments, generateAllPDFs } from './utils/documentGenerator';
@@ -174,7 +175,7 @@ function App() {
 
   const [history, setHistory] = useState<SavedPaper[]>(() => {
     const saved = localStorage.getItem('paperHistory');
-    const parsed = saved ? JSON.parse(saved) : [];
+    const parsed = saved ? JSON.parse(saved) as SavedPaper[] : [];
     if (parsed.length === 0) {
       return [{
         id: 'sample-paper-001',
@@ -202,22 +203,22 @@ function App() {
 
   const [questionBank, setQuestionBank] = useState<QuestionBank>(() => {
     const saved = localStorage.getItem('questionBank');
-    return saved ? JSON.parse(saved) : {};
+    return saved ? JSON.parse(saved) as QuestionBank : {};
   });
 
   const [details, setDetails] = useState<ExamDetails>(() => {
     const saved = localStorage.getItem('formDetails');
-    const d = saved ? JSON.parse(saved) : {
-      collegeName: "NALLA NARASIMHA REDDY EDUCATION SOCIETY'S GROUP OF INSTITUTIONS",
-      examName: 'II B.TECH II SEMESTER – I MID TERM EXAMINATION –FEB-2026',
-      subject: 'Database Management Systems',
-      subjectCode: '22CS404PC',
-      branch: 'COMMON TO (CSE, CSD, CSM & IT)',
-      date: '20-02-2026 (A.N)',
-      time: '2 Hours (1:30PM TO 3:30PM)',
-      maxMarks: 30,
+    const d = saved ? JSON.parse(saved) as ExamDetails : {
+      collegeName: "TECH UNIVERSITY OF EXCELLENCE",
+      examName: 'B.TECH II YEAR I SEMESTER – SAMPLE EXAMINATION',
+      subject: 'Sample: Computer Networks',
+      subjectCode: 'CS301',
+      branch: 'CSE',
+      date: '2026-03-24',
+      time: '3 Hours',
+      maxMarks: 100,
     };
-    return { ...d, collegeName: "NALLA NARASIMHA REDDY EDUCATION SOCIETY'S GROUP OF INSTITUTIONS" };
+    return d;
   });
 
   const [mcqs, setMcqs] = useState<Question[]>(() => {
@@ -324,23 +325,43 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
 
-        {/* Home / Input View */}
+        {/* Home View */}
         <Route path="/" element={
           <ProtectedRoute isAuthenticated={isAuthenticated}>
             <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%)' }}>
               <NavBar
                 left={
                   <>
-                    <span style={{ color: '#a5b4fc', fontWeight: 800, fontSize: 16, marginRight: 8 }}>📝 Paper Setter</span>
+                    <span onClick={() => navigate('/')} style={{ color: '#a5b4fc', fontWeight: 800, fontSize: 16, marginRight: 8, cursor: 'pointer' }}>📝 Paper Setter</span>
                     <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13, alignSelf: 'center', marginLeft: 8, paddingLeft: 12, borderLeft: '1px solid rgba(255,255,255,0.2)' }}>
                       Welcome, <strong style={{ color: '#fff' }}>{currentUser}</strong>
                     </span>
                   </>
                 }
                 right={
+                  <button style={btn('rgba(239,68,68,0.7)')} onClick={handleLogout}>Logout</button>
+                }
+              />
+              <HomeView currentUser={currentUser} isAdmin={isAdmin} />
+              <PageFooter />
+            </div>
+          </ProtectedRoute>
+        } />
+
+        {/* Generator View */}
+        <Route path="/generator" element={
+          <ProtectedRoute isAuthenticated={isAuthenticated}>
+            <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #0f172a 100%)' }}>
+              <NavBar
+                left={
+                  <div onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ color: '#a5b4fc', fontWeight: 800, fontSize: 16 }}>📝 Paper Setter</span>
+                    <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12 }}>/ Generator</span>
+                  </div>
+                }
+                right={
                   <>
-                    {isAdmin && <button style={btn('rgba(16,185,129,0.85)')} onClick={() => navigate('/admin')}>Admin Panel</button>}
-                    <button style={btn('rgba(99,102,241,0.85)')} onClick={() => navigate('/bank')}>Question Bank</button>
+                    <button style={btn('rgba(107,114,128,0.7)')} onClick={() => navigate('/')}>Home</button>
                     <button style={btn('rgba(124,58,237,0.85)')} onClick={() => navigate('/history')}>Previous Papers</button>
                     <button style={btn('rgba(239,68,68,0.7)')} onClick={handleLogout}>Logout</button>
                   </>
@@ -383,7 +404,7 @@ function App() {
                 left={<span style={{ color: '#a5b4fc', fontWeight: 800, fontSize: 16 }}>📂 Previous Papers</span>}
                 right={
                   <>
-                    <button style={btn('rgba(107,114,128,0.7)')} onClick={() => navigate('/')}>Back to Edit</button>
+                    <button style={btn('rgba(107,114,128,0.7)')} onClick={() => navigate('/')}>Home</button>
                     <button style={btn('rgba(59,130,246,0.7)')} onClick={() => navigate('/preview')} disabled={sets.length === 0}>
                       Back to Preview
                     </button>
@@ -428,7 +449,8 @@ function App() {
             <div style={{ minHeight: '100vh', background: '#f1f5f9' }}>
               <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 24px', background: 'linear-gradient(90deg, #1e1b4b, #312e81)', boxShadow: '0 2px 12px rgba(0,0,0,0.4)' }} className="print:hidden">
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                  <button style={btn('rgba(107,114,128,0.7)')} onClick={() => navigate('/')}>← Back to Edit</button>
+                  <button style={btn('rgba(107,114,128,0.7)')} onClick={() => navigate('/generator')}>← Back to Edit</button>
+                  <button style={btn('rgba(107,114,128,0.7)')} onClick={() => navigate('/')}>Home</button>
                   <button style={btn('rgba(124,58,237,0.7)')} onClick={() => navigate('/history')}>Previous Papers</button>
                   <div style={{ display: 'flex', gap: 6, marginLeft: 8 }}>
                     {sets.map((set, index) => (
